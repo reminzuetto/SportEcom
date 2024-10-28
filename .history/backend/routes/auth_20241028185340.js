@@ -3,6 +3,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.post("/register", async (req, res) => {
     await newUser.save();
     res.status(201).json({ message: "Registration successful" });
   } catch (err) {
-    console.error("Error during registration:", err);
+    console.error("Error during registration:", err); // Log the error to the console for easier tracking
     res.status(500).json({ message: "An error occurred" });
   }
 });
@@ -63,13 +64,13 @@ router.post("/login", async (req, res) => {
     });
 
     res.status(200).json({ token, message: "Login successful" });
+    console.log(user);
   } catch (err) {
-    console.error("Error during login:", err);
+    console.error("Error during login:", err); // Log the error to the console
     res.status(500).json({ message: "An error occurred" });
   }
 });
 
-// Middleware for token authentication
 const auth = (req, res, next) => {
   const token = req.header("Authorization").replace("Bearer ", "");
 
@@ -86,24 +87,24 @@ const auth = (req, res, next) => {
   }
 };
 
-// Update user information
+// Cập nhật thông tin người dùng
 router.put("/save", async (req, res) => {
   try {
-    const { username, name, address, phone, email } = req.body;
+    const { username, name, address, phone, email } = req.body; // Lấy thông tin từ request body
 
-    // Find user by username
+    // Tìm user dựa trên username
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Update user information
+    // Cập nhật thông tin người dùng
     user.name = name || user.name;
     user.address = address || user.address;
     user.phone = phone || user.phone;
     user.email = email || user.email;
 
-    // Save updated user
+    // Lưu lại user đã cập nhật
     await user.save();
 
     res
