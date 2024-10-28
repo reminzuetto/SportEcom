@@ -31,7 +31,7 @@ const Login = () => {
 
       if (response.ok) {
         const { token, user } = data;
-        localStorage.setItem("user", JSON.stringify(user)); // Lưu user vào Local Storage
+        localStorage.setItem("token", token);
         navigate("/customer-info", { state: user });
       } else {
         setError(data.message || "Invalid username or password");
@@ -39,7 +39,7 @@ const Login = () => {
     } catch (error) {
       setError("An error occurred. Please try again.");
     } finally {
-      setLoading(false); // Dừng loading
+      setLoading(false); // Stop loading
     }
   };
 

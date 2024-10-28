@@ -3,10 +3,10 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const authMiddleware = require("../middleware/auth");
-const jwt = require("jsonwebtoken");
 
 const router = express.Router();
+
+var currentUserName = "";
 
 // User registration
 router.post("/register", async (req, res) => {
@@ -71,22 +71,6 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "An error occurred" });
   }
 });
-
-const auth = (req, res, next) => {
-  const token = req.header("Authorization").replace("Bearer ", "");
-
-  if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ message: "Token is not valid" });
-  }
-};
 
 // Cập nhật thông tin người dùng
 router.put("/save", async (req, res) => {

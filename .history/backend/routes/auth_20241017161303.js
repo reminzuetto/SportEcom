@@ -3,10 +3,10 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const authMiddleware = require("../middleware/auth");
-const jwt = require("jsonwebtoken");
 
 const router = express.Router();
+
+var currentUserName = "";
 
 // User registration
 router.post("/register", async (req, res) => {
@@ -72,50 +72,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
-const auth = (req, res, next) => {
-  const token = req.header("Authorization").replace("Bearer ", "");
+// router.put("/save", async (res, req) => {
+//   try {
+//     const userInfo = ({ name, address, phone, email } = body.req);
 
-  if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ message: "Token is not valid" });
-  }
-};
-
-// Cập nhật thông tin người dùng
-router.put("/save", async (req, res) => {
-  try {
-    const { username, name, address, phone, email } = req.body; // Lấy thông tin từ request body
-
-    // Tìm user dựa trên username
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    // Cập nhật thông tin người dùng
-    user.name = name || user.name;
-    user.address = address || user.address;
-    user.phone = phone || user.phone;
-    user.email = email || user.email;
-
-    // Lưu lại user đã cập nhật
-    await user.save();
-
-    res
-      .status(200)
-      .json({ message: "User information updated successfully", user });
-  } catch (err) {
-    console.error("Error updating user information:", err);
-    res.status(500).json({ message: "An error occurred" });
-  }
-});
+//     const user = await User.findOne({ username });
+//     if (!user) {
+//       return res
+//         .status(400)
+//         .json({ message: "Username or password is incorrect" });
+//     }
+//   } catch (err) {}
+// });
 
 // Export router for use in other files
 module.exports = router;

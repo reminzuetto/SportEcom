@@ -31,6 +31,7 @@ const Login = () => {
 
       if (response.ok) {
         const { token, user } = data;
+        localStorage.setItem("token", token); // Lưu token vào Local Storage
         localStorage.setItem("user", JSON.stringify(user)); // Lưu user vào Local Storage
         navigate("/customer-info", { state: user });
       } else {

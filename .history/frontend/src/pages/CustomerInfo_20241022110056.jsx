@@ -18,36 +18,16 @@ const CustomerInfo = () => {
   };
 
   // Function to handle form submission
-  const handleSave = async (e) => {
+  const handleSave = (e) => {
     e.preventDefault();
+    setError("");
+    setSaved(true);
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/users/save`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            username: user.username, // Thêm username để tìm user
-            name: customerInfo.name,
-            address: customerInfo.address,
-            phone: customerInfo.phone,
-            email: customerInfo.email,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const updatedUser = await response.json();
-        console.log("User updated:", updatedUser);
-      }
-    } catch (error) {
-      console.error("Error updating user information", error);
-    }
+      // const response = await fetch();
+      console.log("Customer information saved:", customerInfo);
+      setSaved(true);
+    } catch (error) {}
   };
 
   return (

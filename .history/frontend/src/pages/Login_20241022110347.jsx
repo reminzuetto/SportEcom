@@ -1,28 +1,27 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const CustomerInfo = () => {
-  // State to store customer information
+  const location = useLocation(); // Lấy thông tin từ location
+  const user = location.state; // Lấy user từ state
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     address: "",
     phone: "",
     email: "",
   });
-
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
-  // Function to handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCustomerInfo({ ...customerInfo, [name]: value });
   };
 
-  // Function to handle form submission
   const handleSave = async (e) => {
     e.preventDefault();
-
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/users/save`,
         {
@@ -32,7 +31,7 @@ const CustomerInfo = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            username: user.username, // Thêm username để tìm user
+            username: user.username, // Sử dụng username từ state
             name: customerInfo.name,
             address: customerInfo.address,
             phone: customerInfo.phone,
@@ -44,9 +43,14 @@ const CustomerInfo = () => {
       if (response.ok) {
         const updatedUser = await response.json();
         console.log("User updated:", updatedUser);
+        setSaved(true); // Đánh dấu là đã lưu thành công
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || "Failed to save user information");
       }
     } catch (error) {
       console.error("Error updating user information", error);
+      setError("An error occurred. Please try again.");
     }
   };
 
@@ -65,7 +69,6 @@ const CustomerInfo = () => {
             required
           />
         </div>
-
         <div style={styles.inputGroup}>
           <label>Address:</label>
           <input
@@ -77,7 +80,6 @@ const CustomerInfo = () => {
             required
           />
         </div>
-
         <div style={styles.inputGroup}>
           <label>Phone:</label>
           <input
@@ -89,7 +91,6 @@ const CustomerInfo = () => {
             required
           />
         </div>
-
         <div style={styles.inputGroup}>
           <label>Email:</label>
           <input
@@ -101,20 +102,20 @@ const CustomerInfo = () => {
             required
           />
         </div>
-
         <button type="submit" style={styles.button}>
           Save
         </button>
       </form>
-
       {saved && (
         <p style={styles.successMessage}>Information saved successfully!</p>
       )}
+      {error && <p style={styles.error}>{error}</p>}{" "}
+      {/* Hiển thị thông báo lỗi */}
     </div>
   );
 };
 
-// Inline styles for the form
+// Inline styles for the form (same as before)
 const styles = {
   container: {
     display: "flex",
@@ -152,6 +153,10 @@ const styles = {
   },
   successMessage: {
     color: "green",
+    marginTop: "15px",
+  },
+  error: {
+    color: "red",
     marginTop: "15px",
   },
 };
